@@ -26,8 +26,8 @@ gem 'turbolinks'
 gem 'jbuilder', '~> 1.2'
 
 # Using couchrest to access Cloudant
-gem 'couchrest'
-gem 'couchrest_model'
+#gem 'couchrest'
+gem 'couchrest_model', '2.0.1'
 
 group :doc do
   # bundle exec rake doc:rails generates the API under doc/api.

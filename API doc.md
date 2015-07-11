@@ -85,5 +85,7 @@ Data about Invoices and their payment status
   <tr>
     <td>created</td><td>timestamp</td><td>not empty</td>
   </tr>
+  <tr>
+    <td>remitter</td><td>String, reference:remitter</td><td></td>
 </table>
 
