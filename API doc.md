@@ -55,3 +55,24 @@ Remitter initiates a payment using their mobile phone.
 * Output
   * Confirmation
 
+Objects
+-------
+### Remitter
+Contains data about registered remitters
+* JSON Schema
+
+### Merchant
+Data about registered merchants
+* JSON Schema
+
+### Invoice
+Data about Invoices and their payment status
+* JSON Schema
+|Field        |Type       |Validation                                        |
+|-------------|-----------|--------------------------------------------------|
+|Invoice      |String, key|not empty                                         |
+|Amount       |Float      |not empty                                         |
+|PaymentStatus|String     |one of: [initiated, failed, successful, presented]|
+|created      |timestamp  |not empty                                         |
+
+
