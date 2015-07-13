@@ -1,0 +1,120 @@
+/**
+ * Remitter resource API
+ */
+
+var util = require('util');
+var cfEnv = require('cfenv');
+var appEnv = cfEnv.getAppEnv();
+var remitterParty = "remitter";
+var mobileNumberID = "mobileNumber";
+
+
+var couchServiceCred = appEnv.getServiceCreds("cloudant-payment-api") || {
+                     database: "mobile-payments",
+                     url: "http://localhost:5984/",
+                 };
+
+console.log("[INF]", "couchServiceCred\n" + util.inspect(couchServiceCred));
+var nano = require('nano')(couchServiceCred.url);
+console.log("[INF]", "nano\n" + util.inspect(nano));
+
+var dbName = couchServiceCred.database;
+nano.db.get(dbName, function(err, body){
+  if(err){
+    console.log("[ERR]", "Error getting DB " + dbName);
+    console.log(err);
+    nano.db.create(dbName, function(err,body){
+      if(err){
+        console.log("[ERR]", "Error creating DB " + dbName);
+        console.log(err);
+      }else{
+        console.log("[INF]", "Created DB " + dbName);
+        console.log(body);
+      }
+    });
+  }else{
+    console.log("[INF]", "Found DB " + dbName);
+    console.log(body);
+  };
+});
+
+var remitterDB = nano.use(dbName);
+
+function getRemitter(req, res){
+  // variables defined in the Swagger document can be referenced using req.swagger.params.{parameter_name}
+  var mobileNumber = req.swagger.params.mobileNumber.value;
+  var defaultAccount = {
+      name: "Iwan Winoto",
+      bsb: "082001",
+      account: "123-4567-8910"
+  };
+  var remitter = {
+      name: "Iwan Winoto",
+      partyType: "remitter",
+      identifier: "0412-345-678",
+      identifierType: "mobileNumber",
+      account: defaultAccount
+  };
+  res.json(remitter);
+};
+
+function addRemitter(req, res){
+  // variables defined in the Swagger document can be referenced using req.swagger.params.{parameter_name}
+  var remitter = req.body;
+  console.log("[INF]", "Adding remitter: ");
+  console.log(util.inspect(remitter));
+  /*
+  var defaultAccount = {
+      name: "New name",
+      bsb: remitter.account.bsb,
+      account: remitter.account.account
+  };
+  */
+  
+  remitterDB.insert(remitter, function(err, body, header){
+    if (err) {
+      console.log('[remitter.insert] ', err.message);
+      return;
+    }
+    console.log("[INF]", 'you have inserted the remitter.')
+    var newRemitter = body;
+    console.log(newRemitter);
+    res.json(newRemitter);
+  });
+
+};
+
+function updateRemitter(req, res){
+  // variables defined in the Swagger document can be referenced using req.swagger.params.{parameter_name}
+  var mobileNumber = req.body.remitter.value;
+  var newRemitter = req.body;
+
+  var defaultAccount = {
+      name: newRemitter.account.name,
+      bsb: newRemitter.account.bsb,
+      account: newRemitter.account.account
+  };
+  var remitter = {
+      partyType: "remitter",
+      name: newRemitter.name,
+      identifier: mobileNumber,
+      identifierType: "mobileNumber",
+      account: defaultAccount
+  };
+  res.json(remitter);
+};
+
+
+function deleteRemitter(req, res){
+  // variables defined in the Swagger document can be referenced using req.swagger.params.{parameter_name}
+  var mobileNumber = req.swagger.params.mobileNumber.value;
+  res.status(200).json();
+
+};
+
+module.exports = {
+    getRemitter: getRemitter,
+    addRemitter: addRemitter,
+    updateRemitter: updateRemitter,
+    deleteRemitter: deleteRemitter
+};
