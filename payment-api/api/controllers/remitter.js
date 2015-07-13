@@ -83,18 +83,7 @@ function updateRemitter(req, res){
   var mobileNumber = req.swagger.params.mobileNumber.value;
   var newRemitter = req.body;
   var remitter;
-/*
-  var defaultAccount = {
-      name: newRemitter.account.name,
-      bsb: newRemitter.account.bsb,
-      account: newRemitter.account.account
-  };
-  var remitter = {
-      remitterName: newRemitter.name,
-      mobileNumber: mobileNumber,
-      account: defaultAccount
-  };
-*/
+
   remitterDB.view("remitters", "remitter_by_mobileNumber", {key: mobileNumber}, function(err, body){
     if(body.rows.length != 0){
       console.log("[INF]", util.inspect(body));
