@@ -19,10 +19,12 @@ produces:
   - application/json
 paths:
   # Remitter resources
-  /remitter:
+  /remitters:
     # binds a127 app logic to a route
-    x-swagger-router-controller: remitter
+    x-swagger-router-controller: remitters
     get:
+      tags:
+        - remitters
       description: Get a remitter by mobile phone number
       # used as the method name of the controller
       operationId: getRemitter
@@ -60,6 +62,8 @@ paths:
 #          schema:
 #            $ref: "#/definitions/ErrorResponse"
     post:
+      tags:
+        - remitters
       description: Register a new remitter mobile number
       operationId: addRemitter
       parameters:
@@ -87,6 +91,8 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
     put:
+      tags:
+        - remitters
       description: Update a remitter
       operationId: updateRemitter
       parameters:
@@ -117,6 +123,8 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
     delete:
+      tags:
+        - remitters
       description: Delete a remitter
       operationId: deleteRemitter
       parameters:
@@ -136,10 +144,12 @@ paths:
             $ref: "#/definitions/ErrorResponse"
 
   # Merchant resources
-  /merchant:
+  /merchants:
     # binds a127 app logic to a route
-    x-swagger-router-controller: merchant
+    x-swagger-router-controller: merchants
     get:
+      tags:
+        - merchants
       description: Get a merchant by ABN
       # used as the method name of the controller
       operationId: getMerchant
@@ -177,6 +187,8 @@ paths:
 #          schema:
 #            $ref: "#/definitions/ErrorResponse"
     post:
+      tags:
+        - merchants
       description: Register a new merchant ABN
       operationId: addMerchant
       parameters:
@@ -204,6 +216,8 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
     put:
+      tags:
+        - merchants
       description: Update a merchant
       operationId: updateMerchant
       parameters:
@@ -234,6 +248,8 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
     delete:
+      tags:
+        - merchants
       description: Delete a merchant
       operationId: deleteMerchant
       parameters:
@@ -251,7 +267,279 @@ paths:
           description: Not found
           schema:
             $ref: "#/definitions/ErrorResponse"
-    
+
+  # Merchant resources
+  /invoices:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: invoices
+    get:
+      tags:
+        - invoices
+      description: Get an invoice by invoice number
+      # used as the method name of the controller
+      operationId: getInvoice
+      parameters:
+        - name: invoice
+          in: query
+          description: The ID of the invoice
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/Invoice"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+#    get:
+#      description: Get all merchants
+      # used as the method name of the controller
+#      operationId: getAllMerchant
+#      responses:
+#        "200":
+#          description: Success
+#          type: array
+#          items:
+            # a pointer to a definition
+#            $ref: "#/definitions/Merchant"
+        # responses may fall through to errors
+#        default:
+#          description: Error
+#          schema:
+#            $ref: "#/definitions/ErrorResponse"
+    post:
+      tags:
+        - invoices
+      description: Create a new Invoice
+      operationId: addInvoice
+      parameters:
+        - name: invoice
+          in: body
+          description: Invoice object to store
+          required: true
+          schema:
+            $ref: "#/definitions/Invoice"
+            required:
+              - invoice
+              - status
+              - amount
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Invoice"
+        "201":
+          description: Success
+          schema:
+            $ref: "#/definitions/Invoice" 
+        "405":
+          description: Invalid input
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+  # Manager inbvoice state            
+  /invoices/generated:
+    get:
+      tags:
+        - invoices
+      description: Get all invoices where status is generated
+      operationId: generatedInvoices
+      responses:
+        "200":
+          description: Succes
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Invoice"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /invoices/presented:
+    get:
+      tags:
+        - invoices
+      description: Get all invoices where status is presented
+      operationId: presentedInvoices
+      responses:
+        "200":
+          description: Succes
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Invoice"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    put:
+      tags:
+        - invoices
+      description: Change status of invoice from "generated" to "presented"
+      operationId: setStatusPresented
+      parameters:
+        - name: invoice
+          in: query
+          description: Key to the invoice to be updated
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+        "405":
+          description: Invalid input, invalid starting state
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /invoices/initiated:
+    get:
+      tags:
+        - invoices
+      description: Get all invoices where status is payment initiated
+      operationId: initiatedInvoices
+      responses:
+        "200":
+          description: Succes
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Invoice"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    put:
+      tags:
+        - invoices
+      description: Change status of invoice from "presented" to payment "initiated"
+      operationId: setStatusInitiated
+      parameters:
+        - name: invoice
+          in: query
+          description: Key to the invoice to be updated
+          required: true
+          type: string
+        - name: remitter
+          in: body
+          description: Remitter initaiting the payment
+          required: true
+          schema:
+            $ref: "#/definitions/Remitter"
+      responses:
+        "200":
+          description: Success
+        "405":
+          description: Invalid input, invalid starting state
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /invoices/successful:
+    get:
+      tags:
+        - invoices
+      description: Get all invoices where status is payment sucessful
+      operationId: successfulInvoices
+      responses:
+        "200":
+          description: Succes
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Invoice"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    put:
+      tags:
+        - invoices
+      description: Change status of invoice from payment "initiated" to payment "successful"
+      operationId: setStatusSuccessful
+      parameters:
+        - name: invoice
+          in: query
+          description: Key to the invoice to be updated
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+        "405":
+          description: Invalid input, invalid starting state
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+  /invoices/failed:
+    get:
+      tags:
+        - invoices
+      description: Get all invoices where status is payment failed
+      operationId: failedInvoices
+      responses:
+        "200":
+          description: Succes
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Invoice"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    put:
+      tags:
+        - invoices
+      description: Change status of invoice from payment "initiated" to payment "failed"
+      operationId: setStatusFailed
+      parameters:
+        - name: invoice
+          in: query
+          description: Key to the invoice to be updated
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+        "405":
+          description: Invalid input, invalid starting state
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: Not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+
 # complex objects have schema definitions
 definitions:
   Remitter:
@@ -279,6 +567,7 @@ definitions:
       status:
         type: string
         enum:
+          - generated
           - presented
           - initiated
           - successful
