@@ -14,7 +14,7 @@ function getRemitter(req, res){
   // variables defined in the Swagger document can be referenced using req.swagger.params.{parameter_name}
   var mobileNumber = req.swagger.params.mobileNumber.value;
 
-  db.view("remitters", "remitter_by_mobileNumber", {key: mobileNumber}, function(err, body){
+  mobilePaymentsDB.remitterByMobileNumber(mobileNumber, function(err, body){
     if(body.rows.length != 0){
       remitter = body.rows[0].value;
       res.json(remitter);
@@ -30,7 +30,7 @@ function addRemitter(req, res){
   console.log("[INF]", "Adding remitter: ");
   console.log(util.inspect(remitter));
   
-  db.view("remitters", "remitter_by_mobileNumber", {key: remitter.mobileNumber}, function(err, body){
+  mobilePaymentsDB.remitterByMobileNumber(remitter.mobileNumber, function(err, body){
     if(body.rows.length != 0){
       var msg = "Remitter with mobileNumber \"" + remitter.mobileNumber + "\" already exists.";
       console.log("[ERR]", msg);
@@ -57,31 +57,32 @@ function updateRemitter(req, res){
   var newRemitter = req.body;
   var remitter;
 
-  db.view("remitters", "remitter_by_mobileNumber", {key: mobileNumber}, function(err, body){
+  mobilePaymentsDB.remitterByMobileNumber(mobileNumber, function(err, body){
     if(body.rows.length != 0){
       console.log("[INF]", util.inspect(body));
       remitter = body.rows[0].value;
+      
+      remitter.remitterName = newRemitter.remitterName || remitter.remitterName;
+      if(newRemitter.account){
+        remitter.account.name = newRemitter.account.name || remitter.account.name;
+        remitter.account.bsb = newRemitter.account.bsb || remitter.account.bsb;
+        remitter.account.account = newRemitter.account.account || remitter.account.account;
+      };    
+      
+      db.insert(remitter, function(err, body, header){
+        if (err) {
+          console.log('[remitter.update] ', err.message);
+          return;
+        }
+        console.log("[INF]", "Remitter updated.")
+        var newRemitter = body;
+        console.log(newRemitter);
+        res.json(newRemitter);
+      });
+
     }else{
       res.status("404").json("Not found")
     };
-
-    remitter.remitterName = newRemitter.remitterName || remitter.remitterName;
-    if(newRemitter.account){
-      remitter.account.name = newRemitter.account.name || remitter.account.name;
-      remitter.account.bsb = newRemitter.account.bsb || remitter.account.bsb;
-      remitter.account.account = newRemitter.account.account || remitter.account.account;
-    };    
-    
-    db.insert(remitter, function(err, body, header){
-      if (err) {
-        console.log('[remitter.update] ', err.message);
-        return;
-      }
-      console.log("[INF]", 'you have updates the remitter.')
-      var newRemitter = body;
-      console.log(newRemitter);
-      res.json(newRemitter);
-    });
   });
 };
 
@@ -91,7 +92,7 @@ function deleteRemitter(req, res){
   var mobileNumber = req.swagger.params.mobileNumber.value;
   var remitter;
   
-  db.view("remitters", "remitter_by_mobileNumber", {key: mobileNumber}, function(err, body){
+  mobilePaymentsDB.remitterByMobileNumber(mobileNumber, function(err, body){
     if(body.rows.length != 0){
       remitter = body.rows[0].value;
       db.destroy(remitter._id, remitter._rev, function(err, body){

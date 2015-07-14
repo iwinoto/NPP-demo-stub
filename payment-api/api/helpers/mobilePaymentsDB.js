@@ -2,26 +2,22 @@
  * New node file
  */
 
-var mobilePaymentsDB;
+var _db;
 var util = require('util');
 var cfEnv = require('cfenv');
 var appEnv = cfEnv.getAppEnv();
 
+// Service credentials for CF or local dev/test
 var couchServiceCred = appEnv.getServiceCreds("cloudant-payment-api") || {
-                     database: "mobile-payments",
+                     database: "mobile-payments_dev",
                      url: "http://localhost:5984/",
                  };
-
-module.exports = {
-  db: db};
-
 console.log("[INF]", "couchServiceCred\n" + util.inspect(couchServiceCred));
 
 var nano = require('nano')(couchServiceCred.url);
 console.log("[INF]", "nano\n" + util.inspect(nano));
 
 var dbName = couchServiceCred.database;
-
 
 nano.db.get(dbName, function(err, body){
   if(err){
@@ -34,17 +30,69 @@ nano.db.get(dbName, function(err, body){
       }else{
         console.log("[INF]", "Created DB " + dbName);
         console.log(body);
-        //mobilePaymentsDB = nano.use(dbName);
+        insertDesignDocs(nano.use(dbName))
       }
     });
   }else{
     console.log("[INF]", "Found DB " + dbName);
     console.log(body);
-    //mobilePaymentsDB = nano.use(dbName);
   };
 });
 
+function insertDesignDocs(db){
+  var remitters = {
+      "all_remitters": {
+        "map": "function(doc) {\n  if(doc.remitterName){\n    emit(null, doc);\n  }\n}"
+    },
+    "remitter_by_mobileNumber": {
+        "map": "function(doc) {\n  if(doc.remitterName){\n    emit(doc.mobileNumber, doc);\n  }\n}"
+    }
+  };
+  var merchants = {
+      "all_merchants": {
+        "map": "function(doc) {\n  if(doc.merchantName){\n    emit(null, doc);\n  }\n}"
+    },
+    "merchant_by_abn": {
+        "map": "function(doc) {\n  if(doc.merchantName){\n    emit(doc.abn, doc);\n  }\n}"
+    }
+  };
+  
+  db.insert({language: "javascript", views: remitters}, "_design/remitters", function(err, body, header){
+    if (err) {
+      console.log('[_design/remitters.insert] ', err.message);
+      return;
+    }
+    console.log("[INF]", 'inserted _design/remitters')
+    console.log(body);
+  });
+  
+  db.insert({language: "javascript", views: merchants}, "_design/merchants", function(err, body, header){
+    if (err) {
+      console.log('[_design/merchants.insert] ', err.message);
+      return;
+    }
+    console.log("[INF]", 'inserted _design/merchants')
+    console.log(body);
+  });
+};
+
+// Export definitions
+
 function db(callback){
-  mobilePaymentsDB = nano.use(dbName);
-  callback(mobilePaymentsDB);
-}
+  _db = nano.use(dbName);
+  callback(_db);
+};
+
+function merchantByABN(abn, callback){
+  _db.view("merchants", "merchant_by_abn", {key: abn}, callback);
+};
+
+function remitterByMobileNumber(mobileNumber, callback){
+  _db.view("remitters", "remitter_by_mobileNumber", {key: mobileNumber}, callback);
+};
+
+module.exports = {
+    db: db,
+    remitterByMobileNumber: remitterByMobileNumber,
+    merchantByABN: merchantByABN
+  };
