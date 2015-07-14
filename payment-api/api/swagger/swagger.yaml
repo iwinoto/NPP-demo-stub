@@ -343,6 +343,8 @@ paths:
 
   # Manager inbvoice state            
   /invoices/generated:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: invoices
     get:
       tags:
         - invoices
@@ -350,7 +352,7 @@ paths:
       operationId: generatedInvoices
       responses:
         "200":
-          description: Succes
+          description: Success
           schema:
             type: array
             items:
@@ -360,6 +362,8 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
   /invoices/presented:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: invoices
     get:
       tags:
         - invoices
@@ -403,6 +407,8 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
   /invoices/initiated:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: invoices
     get:
       tags:
         - invoices
@@ -452,6 +458,8 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
   /invoices/successful:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: invoices
     get:
       tags:
         - invoices
@@ -496,6 +504,8 @@ paths:
             $ref: "#/definitions/ErrorResponse"
 
   /invoices/failed:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: invoices
     get:
       tags:
         - invoices

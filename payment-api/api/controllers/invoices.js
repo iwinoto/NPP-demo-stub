@@ -57,51 +57,56 @@ function addInvoice(req, res){
 };
 
 function generatedInvoices(req, res){
-  mobilePaymentDB.invoicesByStatus("generated", function(err, body){
+  mobilePaymentsDB.invoicesByStatus("generated", function(err, body){
     if(err){
       res.status(500).json(err);
     }else{
-      res.json(body);
+      console.log("[INF]", "Invoices in status == generated: ");
+      console.log(util.inspect(body));
+      console.log("[INF]", "First Invoice in status == generated: ");
+      console.log(util.inspect(body.rows[0].value));
+
+      res.json(body.rows);
     };
   });
 };
 
 function presentedInvoices(req, res){
-  mobilePaymentDB.invoicesByStatus("presented", function(err, body){
+  mobilePaymentsDB.invoicesByStatus("presented", function(err, body){
     if(err){
       res.status(500).json(err);
     }else{
-      res.json(body);
+      res.json(body.rows);
     };
   });
 };
 
 function initiatedInvoices(req, res){
-  mobilePaymentDB.invoicesByStatus("initiated", function(err, body){
+  mobilePaymentsDB.invoicesByStatus("initiated", function(err, body){
     if(err){
       res.status(500).json(err);
     }else{
-      res.json(body);
+      res.json(body.rows);
     };
   });
 };
 
 function successfulInvoices(req, res){
-  mobilePaymentDB.invoicesByStatus("sucessful", function(err, body){
+  mobilePaymentsDB.invoicesByStatus("sucessful", function(err, body){
     if(err){
       res.status(500).json(err);
     }else{
-      res.json(body);
+      res.json(body.rows);
     };
   });
 };
 
 function failedInvoices(req, res){
-  mobilePaymentDB.invoicesByStatus("failed", function(err, body){
+  mobilePaymentsDB.invoicesByStatus("failed", function(err, body){
     if(err){
       res.status(500).json(err);
     }else{
-      res.json(body);
+      res.json(body.rows);
     };
   });
 };
@@ -112,7 +117,10 @@ function setStatusPresented(req, res){
   var invoice;
   
   mobilePaymentsDB.invoicesByInvoice(invoiceId, function(err, body){
-    if(body.rows.length != 0){
+    if(err){
+      console.log("[ERR]", util.inspect(err));
+      res.status(500).json(err);      
+    }else if(body.rows.length != 0){
       console.log("[INF]", util.inspect(body));
       invoice = body.rows[0].value;
       promoteStatus(invoice, "generated", "presented");
@@ -199,7 +207,7 @@ function promoteStatus(invoice, current, next, action){
 module.exports = {
     getInvoice: getInvoice,
     addInvoice: addInvoice,
-    generateInvoices: generateInvoices,
+    generatedInvoices: generatedInvoices,
     presentedInvoices: presentedInvoices,
     initiatedInvoices: initiatedInvoices,
     successfulInvoices: successfulInvoices,

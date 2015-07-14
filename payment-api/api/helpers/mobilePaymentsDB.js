@@ -112,7 +112,7 @@ function invoicesByStatus(status, callback){
 };
 
 function invoicesByInvoice(invoice, callback){
-  _db.view("invoices", "invoices_by_invoices", {key: invoice}, callback);
+  _db.view("invoices", "invoices_by_invoice", {key: invoice}, callback);
 };
 
 module.exports = {
