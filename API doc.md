@@ -69,22 +69,10 @@ Data about registered merchants
 Data about Invoices and their payment status
 * JSON Schema
 
-<table>
-  <tr>
-    <td>Field</td><td>Type</td><td>Validation</td>
-  </tr>
-  <tr>
-    <td>Invoice</td><td>String, key</td><td>not empty</td>
-  </tr>
-  <tr>
-    <td>Amount</td><td>Float</td><td>not empty</td>
-  </tr>
-  <tr>
-    <td>PaymentStatus</td><td>String</td><td>one of: [initiated, failed, successful, presented]</td>
-  </tr>
-  <tr>
-    <td>created</td><td>timestamp</td><td>not empty</td>
-  </tr>
-</table>
-
+Field        |Type       |Validation                                        
+-------------|-----------|--------------------------------------------------
+Invoice      |String, key|not empty                                         
+Amount       |Float      |not empty                                         
+PaymentStatus|String     |one of: [initiated, failed, successful, presented]
+created      |timestamp  |not empty                                         
 
