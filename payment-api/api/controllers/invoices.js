@@ -5,6 +5,7 @@
 
 var mobilePaymentsDB = require("../helpers/mobilePaymentsDB");
 var util = require('util');
+var path = require("path");
 var db;
 
 mobilePaymentsDB.db(function(_db){
@@ -12,19 +13,22 @@ mobilePaymentsDB.db(function(_db){
 });
 
 function getInvoice(req, res){
-  // variables defined in the Swagger document can be referenced using req.swagger.params.{parameter_name}
-  var invoice = req.swagger.params.invoice.value;
+  // parameter mobileNumber is in the path
+  var invoice = path.basename(req.path);
 
   mobilePaymentsDB.invoicesByInvoice(invoice, function(err, body){
-    if(body.rows.length != 0){
-      console.log("[INF]", "Getting invoice by invoice: " + invoice);
-
-      invoice = body.rows[0].value;
-      console.log(util.inspect(invoice));
-      res.json(invoice);
+    if(err){
+      res.status(500).json(err);
     }else{
-      console.log("[ERR]", err);
-      res.status("404").json("Not found")
+      if(body.rows.length != 0){
+        console.log("[INF]", "Getting invoice by invoice ID: " + invoice);
+  
+        invoice = body.rows[0].value;
+        console.log(util.inspect(invoice));
+        res.json(invoice);
+      }else{
+        res.status("404").json("Not found")
+      }
     }
   });
 };

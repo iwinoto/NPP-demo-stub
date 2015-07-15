@@ -278,8 +278,8 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
 
-  # Merchant resources
-  /invoices:
+  # Invoice resources
+  /invoices/{invoiceId}:
     # binds a127 app logic to a route
     x-swagger-router-controller: invoices
     get:
@@ -289,8 +289,8 @@ paths:
       # used as the method name of the controller
       operationId: getInvoice
       parameters:
-        - name: invoice
-          in: query
+        - name: invoiceId
+          in: path
           description: The ID of the invoice
           required: true
           type: string
@@ -321,6 +321,9 @@ paths:
 #          description: Error
 #          schema:
 #            $ref: "#/definitions/ErrorResponse"
+  /invoices:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: invoices
     post:
       tags:
         - invoices
