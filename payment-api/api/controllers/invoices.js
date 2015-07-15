@@ -92,7 +92,7 @@ function initiatedInvoices(req, res){
 };
 
 function successfulInvoices(req, res){
-  mobilePaymentsDB.invoicesByStatus("sucessful", function(err, body){
+  mobilePaymentsDB.invoicesByStatus("successful", function(err, body){
     if(err){
       res.status(500).json(err);
     }else{
@@ -123,7 +123,7 @@ function setStatusPresented(req, res){
     }else if(body.rows.length != 0){
       console.log("[INF]", util.inspect(body));
       invoice = body.rows[0].value;
-      promoteStatus(invoice, "generated", "presented");
+      promoteStatus(invoice, res, "generated", "presented");
     }else{
       res.status(404).json("Not found");
     };
@@ -140,7 +140,7 @@ function setStatusInitiated(req, res){
     if(body.rows.length != 0){
       console.log("[INF]", util.inspect(body));
       invoice = body.rows[0].value;
-      promoteStatus(invoice, "presented", "initiated", function(_invoice){
+      promoteStatus(invoice, res, "presented", "initiated", function(_invoice){
         _invoice.remitterMobile = remitter.mobileNumber;
       });
     }else{
@@ -158,7 +158,7 @@ function setStatusSuccessful(req, res){
     if(body.rows.length != 0){
       console.log("[INF]", util.inspect(body));
       invoice = body.rows[0].value;
-      promoteStatus(invoice, "initiated", "successful");
+      promoteStatus(invoice, res, "initiated", "successful");
     }else{
       res.status(404).json("Not found");
     };
@@ -174,14 +174,14 @@ function setStatusFailed(req, res){
     if(body.rows.length != 0){
       console.log("[INF]", util.inspect(body));
       invoice = body.rows[0].value;
-      promoteStatus(invoice, "initiated", "failed");
+      promoteStatus(invoice, res, "initiated", "failed");
     }else{
       res.status(404).json("Not found");
     };
   });
 };
 
-function promoteStatus(invoice, current, next, action){
+function promoteStatus(invoice, res, current, next, action){
   if(invoice.status == current){
     invoice.status = next;
     if(action){
@@ -196,7 +196,7 @@ function promoteStatus(invoice, current, next, action){
       console.log("[INF]", 'Invoice updated.')
       var newInvoice = body;
       console.log(newInvoice);
-      res.json(newInvoice);
+      res.json();
     });
   }else{
     res.status("405").json("Current status is \"" + invoice.status + "\"\n"
