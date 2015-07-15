@@ -65,11 +65,6 @@ function generatedInvoices(req, res){
     if(err){
       res.status(500).json(err);
     }else{
-      console.log("[INF]", "Invoices in status == generated: ");
-      console.log(util.inspect(body));
-      console.log("[INF]", "First Invoice in status == generated: ");
-      console.log(util.inspect(body.rows[0].value));
-
       res.json(body.rows);
     };
   });
