@@ -12,6 +12,9 @@ var appEnv = cfenv.getAppEnv();
 
 //parse application/json 
 app.use(bodyParser.json())
+// Serve up Swagger UI for API documentation
+app.use('/api-docs', express.static('./views/swagger-ui'));
+app.use('/swagger-docs', express.static('./api/swagger'));
 //app.set('port', appEnv.port);
 //app.set('host', appEnv.host);
 

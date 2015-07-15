@@ -7,10 +7,13 @@ var util = require('util');
 var cfEnv = require('cfenv');
 var appEnv = cfEnv.getAppEnv();
 var designDocs = require("./createCouchDBDesignDocs");
+var _dbNameBase = "mobile-payments"
+var env = process.env.ENV || "test";
+var _dbName = _dbNameBase + (env ? "-" + env : "");
 
 // Service credentials for CF or local dev/test
-var couchServiceCred = appEnv.getServiceCreds("cloudant-payment-api") || {
-                     database: "mobile-payments_dev",
+var couchServiceCred = appEnv.getServiceCreds("cloudant-payments-api") || {
+                     database: _dbName,
                      url: "http://localhost:5984/",
                  };
 console.log("[INF]", "couchServiceCred\n" + util.inspect(couchServiceCred));
@@ -18,7 +21,7 @@ console.log("[INF]", "couchServiceCred\n" + util.inspect(couchServiceCred));
 var nano = require('nano')(couchServiceCred.url);
 console.log("[INF]", "nano\n" + util.inspect(nano));
 
-var dbName = couchServiceCred.database;
+var dbName = couchServiceCred.database || _dbName;
 
 nano.db.get(dbName, function(err, body){
   if(err){
@@ -48,11 +51,19 @@ function db(callback){
 };
 
 function merchantByABN(abn, callback){
-  _db.view("merchants", "merchants_by_abn", {key: abn}, callback);
+  if(abn){
+    _db.view("merchants", "merchants_by_abn", {key: abn}, callback);
+  }else{
+    _db.view("merchants", "merchants_by_abn", callback);
+  }
 };
 
 function remitterByMobileNumber(mobileNumber, callback){
-  _db.view("remitters", "remitters_by_mobileNumber", {key: mobileNumber}, callback);
+  if(mobileNumber){
+    _db.view("remitters", "remitters_by_mobileNumber", {key: mobileNumber}, callback);
+  }else{
+    _db.view("remitters", "remitters_by_mobileNumber", callback);
+  } 
 };
 
 function invoicesByStatus(status, callback){

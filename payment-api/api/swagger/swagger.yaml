@@ -3,7 +3,7 @@ info:
   version: "0.0.1"
   title: Mobile Payments API
 # during dev, should point to your local machine
-host: localhost:6001
+#host: localhost:6001
 # basePath prefixes all resource paths 
 basePath: /v1
 # 
@@ -19,48 +19,52 @@ produces:
   - application/json
 paths:
   # Remitter resources
-  /remitters:
-    # binds a127 app logic to a route
+  /remitters/{mobileNumber}:
     x-swagger-router-controller: remitters
     get:
       tags:
         - remitters
-      description: Get a remitter by mobile phone number
+      description: Get a remitter
       # used as the method name of the controller
       operationId: getRemitter
       parameters:
         - name: mobileNumber
-          in: query
-          description: The mobile phone number of the remitter
+          in: path
+          description: The mobile number of the remitter
           required: true
           type: string
       responses:
         "200":
           description: Success
           schema:
-            # a pointer to a definition
             $ref: "#/definitions/Remitter"
         # responses may fall through to errors
         default:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-#    get:
-#      description: Get all remitters
+
+  /remitters:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: remitters
+    get:
+      tags:
+        - remitters
+      description: Get all remitters sorted by mobile phone number
       # used as the method name of the controller
-#      operationId: getAllRemitters
-#      responses:
-#        "200":
-#          description: Success
-#          type: array
-#          items:
-            # a pointer to a definition
-#            $ref: "#/definitions/Remitter"
+      operationId: getAllRemitters
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: array
+            items: 
+              $ref: "#/definitions/Remitter"
         # responses may fall through to errors
-#        default:
-#          description: Error
-#          schema:
-#            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
     post:
       tags:
         - remitters
@@ -144,7 +148,7 @@ paths:
             $ref: "#/definitions/ErrorResponse"
 
   # Merchant resources
-  /merchants:
+  /merchants/{abn}:
     # binds a127 app logic to a route
     x-swagger-router-controller: merchants
     get:
@@ -155,7 +159,7 @@ paths:
       operationId: getMerchant
       parameters:
         - name: abn
-          in: query
+          in: path
           description: The ABN of the merchant
           required: true
           type: string
@@ -170,22 +174,28 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-#    get:
-#      description: Get all merchants
+  /merchants:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: merchants
+    get:
+      tags:
+        - merchants
+      description: Get all merchants sorted by ABN
       # used as the method name of the controller
-#      operationId: getAllMerchant
-#      responses:
-#        "200":
-#          description: Success
-#          type: array
-#          items:
-            # a pointer to a definition
-#            $ref: "#/definitions/Merchant"
+      operationId: getAllMerchants
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: array
+            items:
+              # a pointer to a definition
+              $ref: "#/definitions/Merchant"
         # responses may fall through to errors
-#        default:
-#          description: Error
-#          schema:
-#            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
     post:
       tags:
         - merchants

@@ -1,0 +1,17 @@
+---
+path: .
+
+env:
+  ENV: "test"
+
+services:
+- cloudant-payments-api
+
+applications:
+- name: mobile-payments-api
+  memory: 256M
+  instances: 1
+  host: iw-mobile-payments-api-dev
+  domain: mybluemix.net
+  command: npm start
+  

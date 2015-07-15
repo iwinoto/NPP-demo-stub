@@ -9,7 +9,7 @@ module.exports = function(grunt) {
     // Application package:
     pkg: grunt.file.readJSON(grunt.template.process('package.json')),
     // Cloud Foundry target
-    cf_env: (grunt.file.readJSON('cf-targets.json'))[(grunt.option('cf-target') || 'public-dev')],
+    cf_env: (grunt.file.readJSON('cf-targets.json'))[(grunt.option('cf-target') || 'public-test')],
     // hostname
     hostname: '<%= cf_env.prefix %>-<%= pkg.name %>-<%= cf_env.space %>',
     // Source header
@@ -129,7 +129,13 @@ module.exports = function(grunt) {
           {src: ['.cfignore'], dest: '<%= dist %>/'},
           {expand: true, src: ['test/**/*.*'], dest: '<%= dist %>/'},
           // copy UI files
-          {expand: true, src: ['views/**/*.*'], dest: '<%= dist %>/'}
+          {expand: true, src: ['views/**/*.*'], dest: '<%= dist %>/'},
+          // copy API files
+          {expand: true, src: ['api/**/*.*'], dest: '<%= dist %>/'},
+          // copy config files
+          {expand: true, src: ['config/**/*.*'], dest: '<%= dist %>/'},
+          // copy model files
+          {expand: true, src: ['model/**/*.*'], dest: '<%= dist %>/'}
         ]
       },
       debug: {
@@ -223,6 +229,7 @@ module.exports = function(grunt) {
   });
   grunt.log.writeln('Route is ' + route);
   grunt.config('env.dev.TEST_ROUTE', route);
+  grunt.log.writeln('Injected route to env.dev.TEST_ROUTE');
 
   // These plugins provide necessary tasks.
   grunt.loadNpmTasks('grunt-contrib-concat');
@@ -235,11 +242,12 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-nodeunit');
   grunt.loadNpmTasks('grunt-env');
   grunt.loadNpmTasks('grunt-shell');
+  grunt.log.writeln('Loaded Grunt tasks');
   
   grunt.registerTask('deploy',
       'Deploy the application to a CF target.\n' +
       'Set up targets in cf-targets.json and services in cf-services.json.\n' +
-      'Pass in a target key using the --cf-target=<target key> option. Defaults to "public-dev".\n' +
+      'Pass in a target key using the --cf-target=<target key> option. Defaults to "public-test".\n' +
       'Set CF userID and password in environment variables CF_USER and CF_PASSWD.',
       ['env:dev', 'shell:login', 'shell:create_services', 'shell:push', 'nodeunit']);
   grunt.registerTask('create_services',
@@ -252,4 +260,5 @@ module.exports = function(grunt) {
   grunt.registerTask('debug', ['clean', 'jshint', 'nodeunit', 'concat', 'copy:debug']);
   grunt.registerTask('test', ['jshint', 'nodeunit']);
   grunt.registerTask('notest', ['clean', 'jshint', 'concat', 'uglify', 'copy:main']);
+  grunt.log.writeln('Registered tasks');
 };

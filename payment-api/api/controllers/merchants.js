@@ -4,6 +4,7 @@
 
 var mobilePaymentsDB = require("../helpers/mobilePaymentsDB");
 var util = require('util');
+var path = require("path");
 var db;
 
 mobilePaymentsDB.db(function(_db){
@@ -11,20 +12,33 @@ mobilePaymentsDB.db(function(_db){
 });
 
 function getMerchant(req, res){
-  // variables defined in the Swagger document can be referenced using req.swagger.params.{parameter_name}
-  var abn = req.swagger.params.abn.value;
+  // parameter mobileNumber is in the path
+  var abn = path.basename(req.path);
 
   mobilePaymentsDB.merchantByABN(abn, function(err, body){
-    if(body.rows.length != 0){
-      console.log("[INF]", "Getting merchant by ABN: " + abn);
-
-      merchant = body.rows[0].value;
-      console.log(util.inspect(merchant));
-      res.json(merchant);
+    if(err){
+      res.status(500).json(err);
     }else{
-      console.log("[ERR]", err);
-      res.status("404").json("Not found")
+      if(body.rows.length != 0){
+        console.log("[INF]", "Getting merchant by ABN: " + abn);
+  
+        merchant = body.rows[0].value;
+        console.log(util.inspect(merchant));
+        res.json(merchant);
+      }else{
+        res.status("404").json("Not found")
+      }
     }
+  });
+};
+
+function getAllMerchants(req, res){
+  mobilePaymentsDB.merchantByABN("", function(err, body){
+    if(err){
+      res.status(500).json(err);
+    }else{
+      res.json(body.rows);
+    };
   });
 };
 
@@ -116,6 +130,7 @@ function deleteMerchant(req, res){
 
 module.exports = {
     getMerchant: getMerchant,
+    getAllMerchants: getAllMerchants,
     addMerchant: addMerchant,
     updateMerchant: updateMerchant,
     deleteMerchant: deleteMerchant

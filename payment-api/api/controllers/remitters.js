@@ -3,6 +3,8 @@
  */
 
 var mobilePaymentsDB = require("../helpers/mobilePaymentsDB");
+var url = require("url");
+var path = require("path");
 var util = require('util');
 var db;
 
@@ -11,16 +13,33 @@ mobilePaymentsDB.db(function(_db){
 });
 
 function getRemitter(req, res){
-  // variables defined in the Swagger document can be referenced using req.swagger.params.{parameter_name}
-  var mobileNumber = req.swagger.params.mobileNumber.value;
+  // parameter mobileNumber is in the path
+  var mobileNumber = path.basename(req.path);
 
   mobilePaymentsDB.remitterByMobileNumber(mobileNumber, function(err, body){
-    if(body.rows.length != 0){
-      remitter = body.rows[0].value;
-      res.json(remitter);
+    if(err){
+      res.status(500).json(err);
     }else{
-      res.status("404").json("Not found")
+      if(body.rows.length != 0){
+        console.log("[INF]", "Getting remitter by mobile number: " + mobileNumber);
+  
+        remitter = body.rows[0].value;
+        console.log(util.inspect(remitter));
+        res.json(remitter);
+      }else{
+        res.status("404").json("Not found")
+      }
     }
+  });
+};
+
+function getAllRemitters(req, res){
+  mobilePaymentsDB.remitterByMobileNumber("", function(err, body){
+    if(err){
+      res.status(500).json(err);
+    }else{
+      res.json(body.rows);
+    };
   });
 };
 
@@ -113,6 +132,7 @@ function deleteRemitter(req, res){
 
 module.exports = {
     getRemitter: getRemitter,
+    getAllRemitters: getAllRemitters,
     addRemitter: addRemitter,
     updateRemitter: updateRemitter,
     deleteRemitter: deleteRemitter

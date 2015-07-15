@@ -1,6 +1,6 @@
 {
-  "cloudant-payment-api": {
-    "type": "cloudant",
-    "plan": "100"
+  "cloudant-payments-api": {
+    "type": "cloudantNoSQLDB",
+    "plan": "Shared"
   }
 }
