@@ -31,7 +31,7 @@ nano.db.get(dbName, function(err, body){
       }else{
         console.log("[INF]", "Created DB " + dbName);
         console.log(body);
-        insertDesignDocs(nano.use(dbName))
+        designDocs.insertDesignDocs(nano.use(dbName))
       }
     });
   }else{
@@ -39,9 +39,6 @@ nano.db.get(dbName, function(err, body){
     console.log(body);
   };
 });
-
-// Update CouchDB design docs
-designDocs.insertDesignDocs(db);
 
 // Export definitions
 
