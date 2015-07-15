@@ -43,7 +43,58 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-
+    put:
+      tags:
+        - remitters
+      description: Update a remitter
+      operationId: updateRemitter
+      parameters:
+        - name: mobileNumber
+          in: path
+          description: Key to remitter to be updated
+          required: true
+          type: string
+        - name: remitter
+          in: body
+          description: New remitter properties. mobileNumber is the key so it will not be changed
+          required: true
+          schema:
+            $ref: "#/definitions/Remitter"
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Remitter"
+        "201":
+          description: Success
+          schema:
+            $ref: "#/definitions/Remitter" 
+        "405":
+          description: Invalid input
+        "404":
+          description: Not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    delete:
+      tags:
+        - remitters
+      description: Delete a remitter
+      operationId: deleteRemitter
+      parameters:
+        - name: mobileNumber
+          in: path
+          description: Key to remitter to be deleted
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+        "201":
+          description: Success
+        "404":
+          description: Not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /remitters:
     # binds a127 app logic to a route
     x-swagger-router-controller: remitters
@@ -94,58 +145,6 @@ paths:
           description: Invalid input
           schema:
             $ref: "#/definitions/ErrorResponse"
-    put:
-      tags:
-        - remitters
-      description: Update a remitter
-      operationId: updateRemitter
-      parameters:
-        - name: mobileNumber
-          in: query
-          description: Key to remitter to be updated
-          required: true
-          type: string
-        - name: remitter
-          in: body
-          description: New remitter properties. mobileNumber is the key so it will not be changed
-          required: true
-          schema:
-            $ref: "#/definitions/Remitter"
-      responses:
-        "200":
-          description: Success
-          schema:
-            $ref: "#/definitions/Remitter"
-        "201":
-          description: Success
-          schema:
-            $ref: "#/definitions/Remitter" 
-        "405":
-          description: Invalid input
-        "404":
-          description: Not found
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-    delete:
-      tags:
-        - remitters
-      description: Delete a remitter
-      operationId: deleteRemitter
-      parameters:
-        - name: mobileNumber
-          in: query
-          description: Key to remitter to be deleted
-          required: true
-          type: string
-      responses:
-        "200":
-          description: Success
-        "201":
-          description: Success
-        "404":
-          description: Not found
-          schema:
-            $ref: "#/definitions/ErrorResponse"
 
   # Merchant resources
   /merchants/{abn}:
@@ -174,6 +173,59 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+    put:
+      tags:
+        - merchants
+      description: Update a merchant
+      operationId: updateMerchant
+      parameters:
+        - name: abn
+          in: path
+          description: Key to merchant to be updated
+          required: true
+          type: string
+        - name: merchant
+          in: body
+          description: New merchant properties. abn is the key so it will not be changed
+          required: true
+          schema:
+            $ref: "#/definitions/Merchant"
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Merchant"
+        "201":
+          description: Success
+          schema:
+            $ref: "#/definitions/Merchant" 
+        "405":
+          description: Invalid input
+        "404":
+          description: Not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    delete:
+      tags:
+        - merchants
+      description: Delete a merchant
+      operationId: deleteMerchant
+      parameters:
+        - name: abn
+          in: path
+          description: Key to merchant to be deleted
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+        "201":
+          description: Success
+        "404":
+          description: Not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
   /merchants:
     # binds a127 app logic to a route
     x-swagger-router-controller: merchants
@@ -225,58 +277,6 @@ paths:
           description: Invalid input
           schema:
             $ref: "#/definitions/ErrorResponse"
-    put:
-      tags:
-        - merchants
-      description: Update a merchant
-      operationId: updateMerchant
-      parameters:
-        - name: abn
-          in: query
-          description: Key to merchant to be updated
-          required: true
-          type: string
-        - name: merchant
-          in: body
-          description: New merchant properties. abn is the key so it will not be changed
-          required: true
-          schema:
-            $ref: "#/definitions/Merchant"
-      responses:
-        "200":
-          description: Success
-          schema:
-            $ref: "#/definitions/Merchant"
-        "201":
-          description: Success
-          schema:
-            $ref: "#/definitions/Merchant" 
-        "405":
-          description: Invalid input
-        "404":
-          description: Not found
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-    delete:
-      tags:
-        - merchants
-      description: Delete a merchant
-      operationId: deleteMerchant
-      parameters:
-        - name: abn
-          in: query
-          description: Key to merchant to be deleted
-          required: true
-          type: string
-      responses:
-        "200":
-          description: Success
-        "201":
-          description: Success
-        "404":
-          description: Not found
-          schema:
-            $ref: "#/definitions/ErrorResponse"
 
   # Invoice resources
   /invoices/{invoiceId}:
@@ -305,22 +305,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-#    get:
-#      description: Get all merchants
-      # used as the method name of the controller
-#      operationId: getAllMerchant
-#      responses:
-#        "200":
-#          description: Success
-#          type: array
-#          items:
-            # a pointer to a definition
-#            $ref: "#/definitions/Merchant"
-        # responses may fall through to errors
-#        default:
-#          description: Error
-#          schema:
-#            $ref: "#/definitions/ErrorResponse"
+
   /invoices:
     # binds a127 app logic to a route
     x-swagger-router-controller: invoices
@@ -340,6 +325,7 @@ paths:
               - invoice
               - status
               - amount
+              - merchantchantABN
       responses:
         "200":
           description: Success
@@ -384,7 +370,7 @@ paths:
       operationId: presentedInvoices
       responses:
         "200":
-          description: Succes
+          description: Success
           schema:
             type: array
             items:
@@ -393,14 +379,17 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /invoices/{invoiceId}/presented:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: invoices
     put:
       tags:
         - invoices
       description: Change status of invoice from "generated" to "presented"
       operationId: setStatusPresented
       parameters:
-        - name: invoice
-          in: query
+        - name: invoiceId
+          in: path
           description: Key to the invoice to be updated
           required: true
           type: string
@@ -438,14 +427,17 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /invoices/{invoiceId}/initiated:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: invoices
     put:
       tags:
         - invoices
       description: Change status of invoice from "presented" to payment "initiated"
       operationId: setStatusInitiated
       parameters:
-        - name: invoice
-          in: query
+        - name: invoiceId
+          in: path
           description: Key to the invoice to be updated
           required: true
           type: string
@@ -489,14 +481,17 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /invoices/{invoiceId}/successful:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: invoices
     put:
       tags:
         - invoices
       description: Change status of invoice from payment "initiated" to payment "successful"
       operationId: setStatusSuccessful
       parameters:
-        - name: invoice
-          in: query
+        - name: invoiceId
+          in: path
           description: Key to the invoice to be updated
           required: true
           type: string
@@ -535,14 +530,17 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /invoices/{invoiceId}/failed:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: invoices
     put:
       tags:
         - invoices
       description: Change status of invoice from payment "initiated" to payment "failed"
       operationId: setStatusFailed
       parameters:
-        - name: invoice
-          in: query
+        - name: invoiceId
+          in: path
           description: Key to the invoice to be updated
           required: true
           type: string
@@ -561,7 +559,6 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-
 
 # complex objects have schema definitions
 definitions:

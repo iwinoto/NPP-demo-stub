@@ -13,7 +13,7 @@ mobilePaymentsDB.db(function(_db){
 });
 
 function getInvoice(req, res){
-  // parameter mobileNumber is in the path
+  // parameter invoiceId is in the path
   var invoice = path.basename(req.path);
 
   mobilePaymentsDB.invoicesByInvoice(invoice, function(err, body){
@@ -52,6 +52,7 @@ function addInvoice(req, res){
         }
         console.log("[INF]", 'Invoice inserted.')
         var newInvoice = body;
+        newInvoice.status = "generated";
         console.log(newInvoice);
         res.json(newInvoice);
       });      
@@ -65,11 +66,6 @@ function generatedInvoices(req, res){
     if(err){
       res.status(500).json(err);
     }else{
-      console.log("[INF]", "Invoices in status == generated: ");
-      console.log(util.inspect(body));
-      console.log("[INF]", "First Invoice in status == generated: ");
-      console.log(util.inspect(body.rows[0].value));
-
       res.json(body.rows);
     };
   });
@@ -116,8 +112,8 @@ function failedInvoices(req, res){
 };
 
 function setStatusPresented(req, res){
-  // variables defined in the Swagger document can be referenced using req.swagger.params.{parameter_name}
-  var invoiceId = req.swagger.params.invoice.value;
+  // parameter invoiceId is in the path
+  var invoiceId = path.basename(req.path);
   var invoice;
   
   mobilePaymentsDB.invoicesByInvoice(invoiceId, function(err, body){
@@ -135,8 +131,9 @@ function setStatusPresented(req, res){
 };
 
 function setStatusInitiated(req, res){
-  // variables defined in the Swagger document can be referenced using req.swagger.params.{parameter_name}
-  var invoiceId = req.swagger.params.invoice.value;
+  // parameter invoiceId is in the path
+  var invoiceId = path.basename(req.path);
+  // remitter is in the body
   var remitter = req.body;
   var invoice;
   
@@ -154,8 +151,8 @@ function setStatusInitiated(req, res){
 };
 
 function setStatusSuccessful(req, res){
-  // variables defined in the Swagger document can be referenced using req.swagger.params.{parameter_name}
-  var invoiceId = req.swagger.params.invoice.value;
+  // parameter invoiceId is in the path
+  var invoiceId = path.basename(req.path);
   var invoice;
   
   mobilePaymentsDB.invoicesByInvoice(invoiceId, function(err, body){
@@ -170,8 +167,8 @@ function setStatusSuccessful(req, res){
 };
 
 function setStatusFailed(req, res){
-  // variables defined in the Swagger document can be referenced using req.swagger.params.{parameter_name}
-  var invoiceId = req.swagger.params.invoice.value;
+  // parameter invoiceId is in the path
+  var invoiceId = path.basename(req.path);
   var invoice;
   
   mobilePaymentsDB.invoicesByInvoice(invoiceId, function(err, body){
